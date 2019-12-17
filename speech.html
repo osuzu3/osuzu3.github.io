@@ -1,0 +1,144 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>星座</title>
+  <link rel="stylesheet" href="style.css">
+<header>
+    <ul>
+        <a href="speech04.html">漫才</a>
+    </ul>
+</header>
+  
+</head>
+<style>
+  .center-box {
+    text-align: center;
+  }
+
+  .large-text {
+    font-size: 4.0rem;
+  }
+</style>
+
+<body>
+  <p class="center-box"><img id="mic" src="micoff.svg" width="300" height="250"></p>
+  <center>
+    <h1>星座を教えてください</h1>
+  </center>
+  <div id="result-div" class="large-text"></div>
+  <script>
+    const resultDiv = document.querySelector('#result-div');
+    const micDiv = document.querySelector('#mic');
+    let speakingtime = 0;
+
+    // 音声認識機能(Chrome)
+    let rec = new webkitSpeechRecognition();
+    let stopped = true;
+    rec.continuous = true;
+    rec.interimResults = false;
+    rec.lang = 'ja-JP';
+
+    micDiv.onclick = function() {
+      if (stopped == true) {
+        stopped = false;
+        resultDiv.innerHTML = "";
+        rec.start();
+      } else {
+        stopped = true;
+        rec.stop();
+      }
+    }
+
+    rec.onstart = function() {
+      console.log('on start');
+      micDiv.setAttribute("src", "micon.svg");
+      speakingtime = 0;
+    };
+
+    rec.onend = function() {
+      console.log('on end');
+      micDiv.setAttribute("src", "micoff.svg");
+      if (stopped == false) {
+        setTimeout(function() {
+          rec.start();
+        }, speakingtime);
+      }
+    };
+
+    rec.onresult = function(e) { //認識結果が得られたら実行される
+      rec.stop();
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) {
+          console.log(e);
+          let text = e.results[i][0].transcript;
+          //        if (text == "角野卓造さん"){//あまりよくないプログラム
+          //          speak("角野たくぞうじゃねーよ")
+          //        }else{
+          //          speak("よくわかりません")
+          //        }
+          console.log(text);
+          speakingtime = text.length * 200;
+          console.log("estimate:", speakingtime, "ms");
+          speak(reply(text));
+          resultDiv.innerHTML = text;
+        }
+      }
+    }
+
+    function reply(text) {
+
+      let re = new RegExp(".*牡羊座.*")
+      if (re.test(text)) {
+        return "3/21〜4/20生まれ。ピュアでまっすぐでストレート。情熱を持ってありのままに生きている人。そとの世界に飛び出していく、スピードを持っている人。守護星は火星。";
+      } else if (text == "おうし座") {
+        return "4/21〜5/21生まれ。慎重でマイペース。五感が優れていて、世界を楽しむことが出来る人。守護星はきんせい。";
+      } else if (text == "双子座") {
+        return "5/22〜6/22生まれ。コミュニケーションが上手で情報通。そとの世界と関わり，旅をし，その中で「自分」を見いだすことのできる人。守護星は水星";
+      } else if (text == "蟹座") {
+        return "6/23〜7/23生まれ。包容りょくがあり感情が豊か。そとの世界には臆病で、内なる感情の世界を守る人。ときには内とそととの壁を壊し，自分の世界を広げていける人。守護星は月";
+      } else if (text == "獅子座") {
+        return "7/24〜8/23生まれ。華やかで誇り高い。世界を飛び出し，自己を魅せる表現りょくと勇気と直感りょくを持ち合わせている人。守護星は太陽";
+      } else if (text == "乙女座") {
+        return "8/24〜9/23生まれ。感性が鋭く豊か。分析りょくに富み，物事をじっくりと知ろうとする人。守護星は水星";
+      } else if (text == "天秤座") {
+        return "9/24〜10/23生まれ。考えることをだいじにし、公平さを優先する人。物事を相対的に考える。バランス感覚にとみ、ファッションセンスの優れた人。守護星はきんせい";
+      } else if (text == "蠍座") {
+        return "10/24〜11/22生まれ。本質を見抜き、隠す人。大切な人にいつか話すために隠しておく、セクシーで秘密主義の人。守護星は冥王星";
+      } else if (text == "射手座") {
+        return "11/23〜12/21生まれ。旅する人たち。新しい分野にどんどん飛び込んでいく、情熱的でストレートでオープンマインドの人。楽観的で、お喋りずきの人が多い星座。守護星は木星";
+      } else if (text == "山羊座") {
+        return "12/22〜1/20生まれ。生きている日々を精一杯生きるリアリスト。実現することに貪欲で、イイと思ったことは時間や手間を惜しまない。とても誠実な人。守護星は土星";
+      } else if (text == "水瓶座") {
+        return "1/21〜2/19生まれ。独自性にとみ、他人の造ったレールは歩まない「ユニーク」な人。純粋無邪気で、友情に厚い、中性的なイメージを持つ星座。守護星は天王星";
+      } else if (text == "魚座") {
+        return "2/20〜3/20生まれ。他人の価値観を否定することのない、自他の苦しみや悲しみを引き受けることのできる人。ピュアな透明な水のような心を持っていて、世俗的価値観も隔て無く素直に受け止める人。守護星は海王星";
+      } else {
+        return "よくわかりません";
+      }
+    }
+
+    // 発話機能をインスタンス化
+    let msg = new SpeechSynthesisUtterance();
+    let voices = window.speechSynthesis.getVoices();
+
+    function speak(text) {
+      // 以下オプション設定（日本語は効かないもよう。。）
+      msg.voice = voices[7]; // 7:Google 日本人 ja-JP ※他は英語のみ
+      msg.volume = 1.0; // 音量 min 0 ~ max 1
+      msg.rate = 1.0; // 速度 min 0 ~ max 10
+      msg.pitch = 1.0; // 音程 min 0 ~ max 2
+
+      msg.text = text; // 喋る内容
+      msg.lang = 'ja-JP'; // en-US or ja-JP
+      // msg.lang = 'en-US'; // en-US or ja-JP
+
+      // 発話実行
+      speechSynthesis.speak(msg);
+    }
+
+    // 終了時の処理
+    msg.onend = function(event) {
+      console.log('喋った時間：' + event.elapsedTime + 'ms');
+    }
+  </script>
+</body></html>
